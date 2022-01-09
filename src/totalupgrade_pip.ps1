@@ -4,7 +4,7 @@ function UpgradePip {
 }
 
 function prompt {
-    $prompt = "Do you wish to update all existing pip-installed packages?`n==========================================================`nEnter `"1`" to continue with update process.`nEnter anything else to exit the process.`n`n> "
+    $prompt = "Do you wish to update all existing pip-installed packages?`n==========================================================`nEnter `"1`" to continue with update process.`nEnter anything else to exit the process.`n`n>"
     $uchoice = Read-Host -Prompt $prompt
     if ($uchoice -eq "1") {
         Write-Output "Upgrading ALL Pip Packages...`n"
@@ -13,7 +13,7 @@ function prompt {
     }
     else {
         return Write-Output "`nExiting window...`n";
-        exit
+        exit;
     }
 }
 
