@@ -1,6 +1,6 @@
 # Total PIP-Package Upgrade
 
-- This is a small powershell script that will allow the user to upgrade _all_ pip packages at once.
+- This is a small powershell script that will allow the user to upgrade _all_ locally installed pip packages at once.
 
 ---
 
