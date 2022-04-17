@@ -1,0 +1,4 @@
+include *.txt
+recursive-include UpgradePipPkgs *.gitkeep
+recursive-include UpgradePipPkgs *.ps1
+recursive-include img *.png
