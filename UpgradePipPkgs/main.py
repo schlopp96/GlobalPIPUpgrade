@@ -1,40 +1,15 @@
 #!/usr/bin/env python3
 
-import logging
 import subprocess
 from os import chdir
 from os.path import dirname
 from typing import NoReturn
-
+from apploggers import processLogger, mainLogger
 from PyLoadBar import load
 
 chdir(dirname(__file__))
 
 __version__ = '0.1.0'
-
-#<--------------------------------------------------------------------------->#
-# Log activity from file.
-mainLogger = logging.getLogger(__name__)
-mainLogger.setLevel(logging.INFO)
-
-# Log activity from upgrade script `global_upgrade.ps1`.
-processLogger = logging.getLogger('Subprocess')
-processLogger.setLevel(logging.INFO)
-
-# Handler for pre/post upgrade subprocess.
-mainFormatter = logging.Formatter('[{asctime} :: {levelname} :: Line: {lineno}] - {message}\n', style='{')
-mainHandler = logging.FileHandler('./logs/output.log')
-mainHandler.setFormatter(mainFormatter)
-
-# Handler for during upgrade subprocess
-processFormatter = logging.Formatter('[{asctime} :: {levelname} :: {funcName}] - {message}\n', style='{')
-processHandler = logging.FileHandler('./logs/output.log')
-processHandler.setFormatter(processFormatter)
-
-# Add handlers to both loggers.
-mainLogger.addHandler(mainHandler)
-processLogger.addHandler(processHandler)
-#<--------------------------------------------------------------------------->#
 
 textborder: str = f'\n<{"*" * 120}>\n'
 
@@ -44,7 +19,7 @@ def upgrade():
     ---
 
     Parameters:
-        :return: start subprocess to upgrade any outdated globally-installed pip packages.
+        :return: subprocess to upgrade all outdated global pip packages.
         :rtype: None
     """
     script_p = subprocess.Popen(['powershell.exe', './scripts/upgrade_pip_pkgs.ps1'], stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
