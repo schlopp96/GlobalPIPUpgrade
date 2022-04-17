@@ -1,17 +1,10 @@
-# Total PIP-Package Upgrade
+# UpgradePipPkgs
 
-- This is a small powershell script that will allow the user to upgrade _all_ locally installed pip packages at once.
+- This is a small powershell script that will allow the user to upgrade _all_ outdated global pip packages at once.
 
 ---
 
-## Usage
-
-1. Run the script using powershell.
-2. Press "`1`" then the "`[ENTER]`" key to begin update process, or enter anything else to exit.
-
-- From here, the upgrading process will continue on its own until its completion, where it will close the console window on its own.
-
-![SCript in action](./img/README_screenshot.png)
+## Full Repo Coming Soon
 
 ---
 
