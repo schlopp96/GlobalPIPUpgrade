@@ -1,1 +1,2 @@
 PyLoadBar==0.0.7.1
+setuptools==58.1.0

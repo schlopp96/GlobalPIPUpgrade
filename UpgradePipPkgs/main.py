@@ -10,6 +10,9 @@ from PyLoadBar import load
 
 chdir(dirname(__file__))
 
+__version__ = '0.1.0'
+
+#<--------------------------------------------------------------------------->#
 # Log activity from file.
 mainLogger = logging.getLogger(__name__)
 mainLogger.setLevel(logging.INFO)
@@ -28,9 +31,10 @@ processFormatter = logging.Formatter('[{asctime} :: {levelname} :: {funcName.upp
 processHandler = logging.FileHandler('./logs/output.log')
 processHandler.setFormatter(processFormatter)
 
-
+# Add handlers to both loggers.
 mainLogger.addHandler(mainHandler)
 processLogger.addHandler(processHandler)
+#<--------------------------------------------------------------------------->#
 
 textborder: str = f'\n<{"*" * 120}>\n'
 
@@ -73,6 +77,7 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     mainLogger.info(f'Closing log file...{textborder}')
     return exit(exitcode)
 
+
 def main() -> NoReturn | None:
     """Program entry point.
 
@@ -84,7 +89,7 @@ def main() -> NoReturn | None:
         :return: starts program and event flow.
         :rtype: NoReturn | None
     """
-    mainLogger.info('Welcome to GlobalPIPUpgrade!')
+    mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
     while True:
         mainLogger.info('Display upgrade prompt...')
         prompt: str = input(f'{"*"*50}\n| > Upgrade all globally installed PIP packages? |\n| > Enter [Y] to begin upgrade process.          |\n| > Enter [N] to exit.                           |\n{"*"* 50}\n>>> ')
