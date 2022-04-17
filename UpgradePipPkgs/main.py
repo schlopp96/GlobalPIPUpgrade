@@ -27,7 +27,7 @@ mainHandler = logging.FileHandler('./logs/output.log')
 mainHandler.setFormatter(mainFormatter)
 
 # Handler for during upgrade subprocess
-processFormatter = logging.Formatter('[{asctime} :: {levelname} :: {funcName.upper()}] - {message}\n', style='{')
+processFormatter = logging.Formatter('[{asctime} :: {levelname} :: {funcName}] - {message}\n', style='{')
 processHandler = logging.FileHandler('./logs/output.log')
 processHandler.setFormatter(processFormatter)
 
