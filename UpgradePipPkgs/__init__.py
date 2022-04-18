@@ -1,1 +1,1 @@
-from .main import main as UpgradePipPkgs
+from .main import main as upgrade_pip_pkgs
