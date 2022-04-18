@@ -2,4 +2,5 @@ include *.in
 include *.txt
 recursive-include UpgradePipPkgs *.gitkeep
 recursive-include UpgradePipPkgs *.ps1
+recursive-include UpgradePipPkgs *.py
 recursive-include img *.png

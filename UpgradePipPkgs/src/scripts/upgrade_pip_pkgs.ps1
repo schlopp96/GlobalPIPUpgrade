@@ -2,7 +2,7 @@
 function UpgradePIP {
     <#
         .SYNOPSIS
-            Upgrade all globally installed PIP packages.
+            Upgrade all globally installed `pip` packages.
 
         .NOTES
             Does NOT take in to account version requirements for package dependencies.

@@ -3,8 +3,9 @@
 import subprocess
 from os import chdir
 from os.path import dirname
+import sys
 from typing import NoReturn
-from applogging import processLogger, mainLogger
+from src.logs import processLogger, mainLogger
 from PyLoadBar import load
 
 chdir(dirname(__file__))
@@ -13,26 +14,100 @@ __version__ = '0.1.0'
 
 textborder: str = f'\n<{"*" * 120}>\n'
 
-def upgrade():
-    """Upgrade global pip packages.
+def get_outdated_pkgs():
+    """Retrieve outdated global pip packages.
+
+    :return: retrieve and pass outdated global pip packages into a list for upgrading.
+    :rtype: List(str|None)
+    """
+    outdated_pkgs =[]
+
+    try:
+        processLogger.info('Retrieving outdated global pip packages...')
+        print('Retrieving outdated global pip packages...\n')
+        cmd = [sys.executable, '-m', 'pip', 'list', '--outdated']
+        get_outdated = subprocess.run(cmd, check=True, stdout=subprocess.PIPE)
+
+    except subprocess.CalledProcessError as err:
+        mainLogger.warning(f'An error occurred during execution of "get_outdated_pkgs" subprocess:\n--> {str(err)}')
+        print(f'An error occurred during execution of "get_outdated_pkgs" subprocess:\n--> {str(err)}')
+    else:
+        outdated_pkgs = list(get_outdated.stdout.decode('utf-8').splitlines()[2:])
+        processLogger.info(f'Outdated packages detected = {len(outdated_pkgs)}.')
+        print(f'Outdated packages detected = {len(outdated_pkgs)}.')
+        return outdated_pkgs
+
+def upgrade_outdated(outdated_pkgs: list):
+    """Run `pip install --upgrade {pkg}` for all packages in `outdated_pkgs`.
+
+    :param outdated_pkgs: list containing found outdated global pip packages.
+    :type outdated_pkgs: list
+    :return: subprocess to upgrade all found outdated global pip packages.
+    :rtype: tuple[list, list]
+    """
+    processLogger.info('Upgrading outdated pip packages...')
+
+    print('Upgrading outdated pip packages...\n')
+
+    processLogger.info('No. Package            Version           Latest           Type  Status  ')
+    processLogger.info('--- ------------------ ----------------- ---------------- ----- --------')
+
+    print('No. Package            Version           Latest           Type  Status  ')
+    print('--- ------------------ ----------------- ---------------- ----- --------')
+
+    upgradelist = []
+    errorlist = []
+    for count, i in enumerate(outdated_pkgs, start=1):
+        pkgname, ver, latest, setuptype = i.split()
+        try:
+            cmd = [sys.executable,'-m','pip','install','--upgrade', pkgname]
+            upgrade_outdated = subprocess.run( cmd, check=True, stdout=subprocess.PIPE )
+        except subprocess.CalledProcessError as err:
+            errorlist.append(pkgname)
+
+            mainLogger.warning('{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                count,pkgname,ver,latest,setuptype,'FAILED'))
+            mainLogger.warning(f'An error occurred during execution of upgrade subprocess:\n--> {str(err)}')
+
+            print('{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                count,pkgname,ver,latest,setuptype,'FAILED'))
+            print(f'An error occurred during execution of upgrade subprocess:\n--> {str(err)}')
+            return exitProgram(1)
+        else:
+            for line in upgrade_outdated.stdout.decode('utf-8').splitlines():
+                if 'Successfully installed' in line:
+                    upgradelist.append(pkgname)
+                    processLogger.info('{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                        count,pkgname,ver,latest,setuptype,'UPGRADED'))
+                    print('{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                        count,pkgname,ver,latest,setuptype,'UPGRADED'))
+    return upgradelist, errorlist
+
+def upgrade_all():
+    """Run `pip install --upgrade {pkgname}` for all installed global pip packages.
 
     ---
 
     Parameters:
-        :return: subprocess to upgrade all outdated global pip packages.
+        :return: subprocess to upgrade all outdated global pip packages using "brute force".
         :rtype: None
     """
-    script_p = subprocess.Popen(['powershell.exe', './scripts/upgrade_pip_pkgs.ps1'], stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+    processLogger.info('Upgrading outdated pip packages using "brute force"...')
+    print('Upgrading outdated pip packages using "brute force"...\n')
+
+    script_p = subprocess.Popen(['powershell.exe', './src/scripts/upgrade_pip_pkgs.ps1'], stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
     with script_p.stdout:
         try:
             for line in iter(script_p.stdout.readline, b''):
                 processLogger.info(line.decode('utf-8').strip())
                 print(line.decode('utf-8').strip())
             mainLogger.info('Successfully completed global PIP package upgrade!')
+            print('\nSuccessfully completed global PIP package upgrade!\n')
+            input('\nPress Enter to Exit.')
             return exitProgram(0)
-        except subprocess.CalledProcessError as e:
-            mainLogger.warning(f'An error occurred during execution of upgrade subprocess:\n--> {str(e)}')
-            print(f'An error occurred during execution of upgrade subprocess:\n--> {str(e)}')
+        except subprocess.CalledProcessError as err:
+            mainLogger.warning(f'An error occurred during execution of upgrade subprocess:\n--> {str(err)}')
+            print(f'An error occurred during execution of upgrade subprocess:\n--> {str(err)}')
             return exitProgram(1)
 
 
@@ -48,7 +123,7 @@ def exitProgram(exitcode: int) -> NoReturn | None:
         :rtype: NoReturn
     """
     mainLogger.info('Preparing to exit...')
-    load('Preparing to exit...', 'Exiting program...', 10, enable_display=False)
+    load('Preparing to exit...', 'Exiting program...', enable_display=False)
     mainLogger.info(f'Closing log file...{textborder}')
     return exit(exitcode)
 
@@ -66,18 +141,45 @@ def main() -> NoReturn | None:
     """
     mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
     while True:
-        mainLogger.info('Displaying menu prompt...')
-        prompt: str = input(f'{"*"*50}\n| > Upgrade all globally installed PIP packages? |\n| > Enter [Y] to begin upgrade process.          |\n| > Enter [N] to exit.                           |\n{"*"* 50}\n>>> ')
+        mainLogger.info('Displaying user options menu...')
+        prompt: str = input(f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade outdated pip pkgs (longer but safer.)  |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> ')
         match prompt.lower():
-            case 'y':
+            case '1':
                 try:
                     print()
-                    return upgrade()
+                    outdated_pkgs = get_outdated_pkgs()
+                    if len( outdated_pkgs ):
+                        upgradelist, errorlist  = upgrade_outdated(outdated_pkgs)
+                        total=len(outdated_pkgs)
+                        mainLogger.info('Successfully completed upgrade process!')
+                        mainLogger.info('\nSUMMARY:')
+                        mainLogger.info('No. of packages upgraded = {}/{}'.format( len(upgradelist), total ))
+                        mainLogger.info('No. of upgrade errors    = {}/{}'.format( len(errorlist), total ))
+                        print('\nSuccessfully completed upgrade process!')
+                        print('\nSUMMARY:')
+                        print('No. of packages upgraded = {}/{}'.format( len(upgradelist), total ))
+                        print('No. of upgrade errors    = {}/{}'.format( len(errorlist), total ))
+                        input('\nPress Enter to Exit.')
+                        return exitProgram(0)
+                    else:
+                        mainLogger.info('No outdated packages found!')
+                        print('No outdated packages found!')
+                        input('\nPress Enter to Exit.')
+                        return exitProgram(0)
                 except KeyboardInterrupt:
-                    mainLogger.warning(f'An error occurred during execution of upgrade subprocess:\n==> Keyboard interrupt was triggered by user.')
-                    print(f'\nAn error occurred during execution of upgrade subprocess:\n==> Keyboard interrupt was triggered by user...\n')
+                    mainLogger.warning(f'An error occurred during execution of "upgrade_outdated" subprocess:\n==> Keyboard interrupt was triggered by user.')
+                    print(f'\nAn error occurred during execution of "upgrade_outdated" subprocess:\n==> Keyboard interrupt was triggered by user...\n')
                     return exitProgram(1)
-            case 'n':
+            case '2':
+                try:
+                    print()
+                    upgrade_all()
+                    return exitProgram(0)
+                except KeyboardInterrupt:
+                    mainLogger.warning(f'An error occurred during execution of "upgrade_all" subprocess:\n==> Keyboard interrupt was triggered by user.')
+                    print(f'\nAn error occurred during execution of "upgrade_all" subprocess:\n==> Keyboard interrupt was triggered by user...\n')
+                    return exitProgram(1)
+            case '3':
                 return exitProgram(0)
             case _:
                 mainLogger.warning(f'Incorrect response from input:\n==> Incorrect response: "{prompt}".\n==> Accepted values are limited to: "Y" or "N".\n==> Please try again.')
