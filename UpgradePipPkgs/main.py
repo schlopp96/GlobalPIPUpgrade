@@ -190,7 +190,7 @@ def main() -> NoReturn | None:
     mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
     while True:
         mainLogger.info('Displaying user options menu...')
-        prompt: str = input(f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade outdated pip pkgs (longer but safer.)   |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> ')
+        prompt: str = input(f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade outdated pip pkgs (longer but safer).   |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> ')
         match prompt.lower():
             case '1':
                 try:
