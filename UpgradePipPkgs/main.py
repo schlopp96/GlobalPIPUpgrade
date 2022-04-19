@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import subprocess
 import sys
 from os import chdir
@@ -8,7 +9,7 @@ from typing import NoReturn
 
 from PyLoadBar import load
 
-from setup_loggers import mainLogger, processLogger
+
 
 chdir(dirname(__file__))
 
@@ -16,13 +17,53 @@ __version__ = '0.1.0'
 
 textborder: str = f'\n<{"*" * 120}>\n'
 
+def config_logs(__file__) -> tuple[logging.Logger, logging.Logger]:
+    """Set program logging configuration and generate loggers.
+
+---
+
+    Parameters:
+        :param __file__: file to be logged.
+        :type __file__: Any
+        :return: program logging configuration.
+        :rtype: tuple[Logger, Logger]
+    """
+    # Log activity from file.
+    mainLogger = logging.getLogger(__file__)
+    mainLogger.setLevel(logging.INFO)
+
+# Log activity from upgrade script `global_upgrade.ps1`.
+    processLogger = logging.getLogger('Subprocess')
+    processLogger.setLevel(logging.INFO)
+
+# Handler for pre/post upgrade subprocess.
+    mainFormatter = logging.Formatter(
+    '[{asctime} :: {levelname} :: Line: {lineno}] - {message}\n', style='{')
+    mainHandler = logging.FileHandler('./logs/output.log')
+    mainHandler.setFormatter(mainFormatter)
+
+# Handler for during upgrade subprocess
+    processFormatter = logging.Formatter(
+    '[{asctime} :: {levelname} :: {funcName}] - {message}\n', style='{')
+    processHandler = logging.FileHandler('./logs/output.log')
+    processHandler.setFormatter(processFormatter)
+
+# Add handlers to both loggers.
+    mainLogger.addHandler(mainHandler)
+    processLogger.addHandler(processHandler)
+
+    return mainLogger,processLogger
+
+# Set logger names.
+mainLogger, processLogger = config_logs(__file__)
+
 def get_outdated_pkgs():
     """Subprocess to retrieve outdated global pip packages using `pip list --outdated`.
 
     ---
 
     Parameters:
-        :return: retrieve and pass outdated global pip packages into a list for upgrading.
+        :return: retrieve and pass outdated global pip packages to a list to be upgraded.
         :rtype: (List[str] | None)
     """
     outdated_pkgs =[]
@@ -54,7 +95,6 @@ def upgrade_outdated(outdated_pkgs: list):
         :rtype: tuple[list, list] | None
     """
     processLogger.info('Upgrading outdated pip packages...')
-
     print('Upgrading outdated pip packages...\n')
 
     processLogger.info('No. Package            Version           Latest           Type  Status  ')
@@ -103,7 +143,7 @@ def upgrade_all():
     processLogger.info('Upgrading outdated pip packages using "brute force"...')
     print('Upgrading outdated pip packages using "brute force"...\n')
 
-    script_p = subprocess.Popen(['powershell.exe', './scripts/force_upgrade_pip_pkgs.ps1'], stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+    script_p = subprocess.Popen(['powershell.exe', './scripts/force_upgrade_pip_pkgs.ps1'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     with script_p.stdout:
         try:
             for line in iter(script_p.stdout.readline, b''):
@@ -160,13 +200,13 @@ def main() -> NoReturn | None:
                         upgradelist, errorlist  = upgrade_outdated(outdated_pkgs)
                         total=len(outdated_pkgs)
                         mainLogger.info('Successfully completed upgrade process!')
-                        mainLogger.info('\nSUMMARY:')
+                        mainLogger.info('SUMMARY:')
                         mainLogger.info(f'No. of packages upgraded = {len(upgradelist)}/{total}')
-                        mainLogger.info(f'No. of upgrade errors    = {len(upgradelist)}/{total}')
+                        mainLogger.info(f'No. of upgrade errors    = {len(errorlist)}/{total}')
                         print('\nSuccessfully completed upgrade process!')
                         print('\nSUMMARY:')
                         print(f'No. of packages upgraded = {len(upgradelist)}/{total}')
-                        print(f'No. of upgrade errors    = {len(upgradelist)}/{total}')
+                        print(f'No. of upgrade errors    = {len(errorlist)}/{total}')
                         input('\nPress Enter to Exit.')
                         return exitProgram(0)
                     else:
