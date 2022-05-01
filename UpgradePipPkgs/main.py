@@ -13,7 +13,7 @@ from PyLoadBar import load
 
 chdir(dirname(__file__))
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 textborder: str = f'\n<{"*" * 120}>\n'
 
@@ -22,11 +22,10 @@ def config_logs(__file__) -> tuple[logging.Logger, logging.Logger]:
 
 ---
 
-    Parameters:
-        :param __file__: file to be logged.
-        :type __file__: Any
-        :return: program logging configuration.
-        :rtype: tuple[Logger, Logger]
+:param __file__: file to be logged.
+:type __file__: Any
+:return: program logging configuration.
+:rtype: tuple[Logger, Logger]
     """
     # Log activity from file.
     mainLogger = logging.getLogger(__file__)
@@ -62,9 +61,8 @@ def get_outdated_pkgs():
 
     ---
 
-    Parameters:
-        :return: retrieve and pass outdated global pip packages to a list to be upgraded.
-        :rtype: (List[str] | None)
+    :return: retrieve and pass outdated global pip packages to a list to be upgraded.
+    :rtype: (List[str] | None)
     """
     outdated_pkgs =[]
 
@@ -88,11 +86,10 @@ def upgrade_outdated(outdated_pkgs: list):
 
     ---
 
-    Parameters:
-        :param outdated_pkgs: list containing found outdated global pip packages.
-        :type outdated_pkgs: list
-        :return: subprocess to upgrade all found outdated global pip packages.
-        :rtype: tuple[list, list] | None
+    :param outdated_pkgs: list containing found outdated global pip packages.
+    :type outdated_pkgs: list
+    :return: subprocess to upgrade all found outdated global pip packages.
+    :rtype: tuple[list, list] | None
     """
     processLogger.info('Upgrading outdated pip packages...')
     print('Upgrading outdated pip packages...\n')
@@ -136,9 +133,8 @@ def upgrade_all():
 
     ---
 
-    Parameters:
-        :return: subprocess to upgrade all outdated global pip packages using "brute force".
-        :rtype: None
+    :return: subprocess to upgrade all outdated global pip packages using "brute force".
+    :rtype: None
     """
     processLogger.info('Upgrading outdated pip packages using "brute force"...')
     print('Upgrading outdated pip packages using "brute force"...\n')
@@ -164,11 +160,10 @@ def exitProgram(exitcode: int) -> NoReturn | None:
 
     ---
 
-    Parameters:
-        :param exitcode: code reflecting whether program exit was due to successful or failed operation.
-        :type exitcode: int
-        :return: exits program with passed `exitcode`.
-        :rtype: NoReturn | None
+    :param exitcode: code reflecting whether program exit was due to successful or failed operation.
+    :type exitcode: int
+    :return: exits program with passed `exitcode`.
+    :rtype: NoReturn | None
     """
     mainLogger.info('Preparing to exit...')
     load('Preparing to exit...', 'Exiting program...', enable_display=False)
@@ -179,13 +174,10 @@ def exitProgram(exitcode: int) -> NoReturn | None:
 def main() -> NoReturn | None:
     """Program entry point.
 
-    # DO NOT CALL MANUALLY.
-
     ---
 
-    Parameters:
-        :return: starts program event flow.
-        :rtype: NoReturn | None
+    :return: starts program event flow.
+    :rtype: NoReturn | None
     """
     mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
     while True:
