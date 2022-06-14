@@ -216,16 +216,7 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     mainLogger.info(f'Closing log file...{textborder}')
     return exit(exitcode)
 
-
-def main() -> NoReturn | None:
-    """Program entry point.
-
-    ---
-
-    :return: starts program event flow.
-    :rtype: NoReturn | None
-    """
-    mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
+def menu():
     while True:
         mainLogger.info('Displaying user options menu...')
         prompt: str = input(
@@ -287,6 +278,18 @@ def main() -> NoReturn | None:
             print(
                 f'\n==> Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.\n'
             )
+
+
+def main() -> NoReturn | None:
+    """Program entry point.
+
+    ---
+
+    :return: starts program event flow.
+    :rtype: NoReturn | None
+    """
+    mainLogger.info(f'Welcome to UpgradePipPkgs {__version__}!')
+    return menu()
 
 
 if __name__ == '__main__':
