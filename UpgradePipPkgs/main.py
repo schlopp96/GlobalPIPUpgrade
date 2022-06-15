@@ -220,7 +220,7 @@ def menu():
     while True:
         mainLogger.info('Displaying user options menu...')
         prompt: str = input(
-            f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade pip pkgs (longer but more verbose).   |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
+            f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade pip pkgs (longer but more verbose).     |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
         )
         if prompt == '1':
             try:
