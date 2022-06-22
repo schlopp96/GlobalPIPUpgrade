@@ -21,13 +21,14 @@ bar = PyLoadBar.PyLoadBar()
 def config_logs(__file__) -> tuple[logging.Logger, logging.Logger]:
     """Set program logging configuration and generate loggers.
 
----
+    ---
 
-:param __file__: file to be logged.
-:type __file__: Any
-:return: program logging configuration.
-:rtype: tuple[Logger, Logger]
+    :param __file__: file to be logged.
+    :type __file__: Any
+    :return: program logging configuration.
+    :rtype: tuple[Logger, Logger]
     """
+
     # Log activity from file.
     mainLogger = logging.getLogger(__file__)
     mainLogger.setLevel(logging.INFO)
@@ -216,7 +217,13 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     mainLogger.info(f'Closing log file...{textborder}')
     return exit(exitcode)
 
+
 def menu():
+    """Display menu and prompt user for selection.
+
+    :return: menu text and user selection.
+    :rtype: None
+    """
     while True:
         mainLogger.info('Displaying user options menu...')
         prompt: str = input(
