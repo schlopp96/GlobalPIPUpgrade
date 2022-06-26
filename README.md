@@ -81,7 +81,13 @@
 
 ## Usage
 
-- In order to use _**`UpgradePipPkgs`**_, start by importing the module to your Python environment:
+- If installed using `pip`, you can start **_UpgradePipPkgs_** by entering the following command in your commandline environment:
+
+  ```shell
+  upgrade-pip-pkgs
+  ```
+
+- In order to use _**`UpgradePipPkgs`**_ within a Python program, start by importing the module to your Python environment:
 
   ```python
   >>> from UpgradePipPkgs import upgrade_pip_pkgs
