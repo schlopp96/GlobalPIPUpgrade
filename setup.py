@@ -16,6 +16,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[reqs],
+    entry_points={'console_scripts': ['upgrade-pip-pkgs=UpgradePipPkgs.main:main']},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: End Users/Desktop",
