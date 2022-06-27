@@ -9,6 +9,7 @@ from os.path import dirname
 from typing import NoReturn
 
 import PyLoadBar
+from alive_progress import alive_bar
 
 sys.path.insert(0, dirname(
     dirname(__file__)))  # Ensure main module can be found by Python.
@@ -110,17 +111,26 @@ def get_outdated_pkgs() -> list[str]:
 
     try:
         logger_subprocess.info('Retrieving outdated global pip packages...')
-        cmd: list[str] = [sys.executable, '-m', 'pip', 'list', '--outdated']
-        get_outdated: subprocess.CompletedProcess = subprocess.run(
-            cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        with alive_bar(stats=False, elapsed=False, monitor=False):
+            cmd: list[str] = [
+                sys.executable, '-m', 'pip', 'list', '--outdated'
+            ]
+            get_outdated: subprocess.CompletedProcess = subprocess.run(
+                cmd,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT)
 
     except subprocess.CalledProcessError as err:
+        print()
         logger_main.error(
             f'An error occurred during execution of "get_outdated_pkgs" subprocess:\n',
             exc_info=err)
 
     finally:
-        outdated_pkgs = get_outdated.stdout.decode('utf-8').splitlines()[2:]
+        print()
+        get_outdated.stdout.decode('utf-8').splitlines()[2:]
         logger_subprocess.info(
             f'Outdated packages detected = {len(outdated_pkgs)}.')
         return outdated_pkgs
@@ -193,18 +203,21 @@ def upgrade_all():
     logger_subprocess.info(
         'Upgrading outdated pip packages using "brute force"...')
 
-    script_p: subprocess.Popen[bytes] = subprocess.Popen(
+    upgrade_script: subprocess.Popen[bytes] = subprocess.Popen(
         ['powershell.exe', './scripts/upgrade_all.ps1'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
 
-    with script_p.stdout as process:
+    with upgrade_script.stdout as process:
         try:
-            for line in iter(process.readline, b''):
-                logger_subprocess.info(line.decode('utf-8').strip())
+            with alive_bar() as bar:
+                for line in iter(process.readline, b''):
+                    logger_subprocess.info(line.decode('utf-8').strip())
+                    bar()
 
             logger_main.info(
                 'Successfully completed global pip package upgrade!')
+
             print('\nEnter any key to exit...\n')
             getch()
             return exitProgram(0)
@@ -230,7 +243,8 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     logger_file.debug('Preparing to exit...')
     bar.load('Preparing to exit...',
              'Exiting program...',
-             enable_display=False)
+             enable_display=False,
+             time=3)
     logger_file.debug(f'Closing log file...{textborder}')
     return exit(exitcode)
 
