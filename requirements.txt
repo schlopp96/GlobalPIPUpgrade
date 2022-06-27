@@ -1,2 +1,3 @@
-PyLoadBar>=0.0.7.1
-setuptools>=58.1.0
+alive_progress>=2.4.1
+PyLoadBar>=0.0.8
+setuptools>=62.1.0
