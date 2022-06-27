@@ -7,7 +7,7 @@ setup(
     name="UpgradePipPkgs",
     version="0.2.0",
     description=
-    "`UpgradePipPkgs` is a packaging tool providing a quick and easy way to upgrade all of your outdated global pip packages.",
+    "Tool for upgrading all `pip` packages within a Python environment using just one command.",
     url='https://github.com/schlopp96/UpgradePipPkgs',
     author='schlopp96',
     author_email='schloppdaddy@gmail.com',
@@ -16,7 +16,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[reqs],
-    entry_points={'console_scripts': ['upgrade-pip-pkgs=UpgradePipPkgs.main:main']},
+    entry_points={
+        'console_scripts': ['upgrade-pip-pkgs=UpgradePipPkgs.main:main']
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: End Users/Desktop",
