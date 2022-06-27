@@ -215,6 +215,7 @@ def upgrade_all():
                     logger_subprocess.info(line.decode('utf-8').strip())
                     bar()
 
+            print()
             logger_main.info(
                 'Successfully completed global pip package upgrade!')
 
