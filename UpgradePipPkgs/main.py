@@ -130,7 +130,7 @@ def get_outdated_pkgs() -> list[str]:
 
     finally:
         print()
-        get_outdated.stdout.decode('utf-8').splitlines()[2:]
+        outdated_pkgs = get_outdated.stdout.decode('utf-8').splitlines()[2:]
         logger_subprocess.info(
             f'Outdated packages detected = {len(outdated_pkgs)}.')
         return outdated_pkgs
