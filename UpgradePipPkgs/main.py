@@ -23,36 +23,33 @@ textborder: str = f'\n<{"*" * 120}>\n'  # Text border.
 bar: PyLoadBar.PyLoadBar = PyLoadBar.PyLoadBar()  # Initialize progress bar.
 
 
-def config_logs(
-    file: str = __file__
-) -> tuple[logging.Logger, logging.Logger, logging.Logger]:
-    """Set program logging configuration and generate loggers.
+def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
+    """Generate program loggers.
 
     ---
 
-    :param file: file to be logged, defaults to `__file__`
     :type file: :class:`str`, optional
     :return: program logging configuration.
     :rtype: :class:`tuple`[:class:`Logger`, :class:`Logger`, :class:`Logger`]
     """
 
     # Log activity from file.
-    logger_main: logging.Logger = logging.getLogger(file)
+    logger_main: logging.Logger = logging.getLogger('MAIN')
     logger_main.setLevel(logging.INFO)
 
     # Log activity from powershell script `upgrade_all.ps1`.
-    logger_subprocess: logging.Logger = logging.getLogger('Subprocess')
-    logger_subprocess.setLevel(logging.INFO)
+    logger_upgrade: logging.Logger = logging.getLogger('UPGRADE')
+    logger_upgrade.setLevel(logging.INFO)
 
-    # Log only to file.
-    logger_file: logging.Logger = logging.getLogger('logfile')
+    # Log other messages to log file.
+    logger_file: logging.Logger = logging.getLogger('LOG')
     logger_file.setLevel(logging.DEBUG)
 
     # Handler for pre/post upgrade subprocess.
     formatter_main: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {levelname} :: {name}] - {message}\n',
+        '[{asctime} :: {name} :: {levelname}] - {message}\n',
         style='{',
-        datefmt="%Y-%m-%d %H:%M:%S")
+        datefmt="%Y-%m-%d - %H:%M:%S")
     file_handler_main: logging.FileHandler = logging.FileHandler(
         './logs/pip_pkg_upgrade_log.log')
     stream_handler_main: logging.StreamHandler = logging.StreamHandler()
@@ -60,23 +57,23 @@ def config_logs(
     file_handler_main.setFormatter(formatter_main)
     stream_handler_main.setFormatter(formatter_main)
 
-    # Handler for during upgrade subprocess
-    formatter_subprocess: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {levelname} :: {name}] - {message}\n',
+    # Handler for upgrade subprocess
+    formatter_upgrade: logging.Formatter = logging.Formatter(
+        '[{asctime} :: {name} :: {levelname}] - {message}\n',
         style='{',
-        datefmt="%Y-%m-%d %H:%M:%S")
-    file_handler_subprocess: logging.FileHandler = logging.FileHandler(
+        datefmt="%Y-%m-%d - %H:%M:%S")
+    file_handler_upgrade: logging.FileHandler = logging.FileHandler(
         './logs/pip_pkg_upgrade_log.log')
-    stream_handler_subprocess: logging.StreamHandler = logging.StreamHandler()
+    stream_handler_upgrade: logging.StreamHandler = logging.StreamHandler()
 
-    file_handler_subprocess.setFormatter(formatter_subprocess)
-    stream_handler_subprocess.setFormatter(formatter_subprocess)
+    file_handler_upgrade.setFormatter(formatter_upgrade)
+    stream_handler_upgrade.setFormatter(formatter_upgrade)
 
     # Handler for file logging.
     formatter_file: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {levelname} :: {name}] - {message}\n',
+        '[{asctime} :: {name} :: {levelname}] - {message}\n',
         style='{',
-        datefmt="%Y-%m-%d %H:%M:%S")
+        datefmt="%Y-%m-%d - %H:%M:%S")
     file_handler_file: logging.FileHandler = logging.FileHandler(
         './logs/pip_pkg_upgrade_log.log')
 
@@ -86,16 +83,16 @@ def config_logs(
     logger_main.addHandler(file_handler_main)
     logger_main.addHandler(stream_handler_main)
 
-    logger_subprocess.addHandler(file_handler_subprocess)
-    logger_subprocess.addHandler(stream_handler_subprocess)
+    logger_upgrade.addHandler(file_handler_upgrade)
+    logger_upgrade.addHandler(stream_handler_upgrade)
 
     logger_file.addHandler(file_handler_file)
 
-    return logger_main, logger_subprocess, logger_file
+    return logger_main, logger_upgrade, logger_file
 
 
 # Generate loggers.
-logger_main, logger_subprocess, logger_file = config_logs('UpgradePipPkgs')
+logger_main, logger_upgrade, logger_file = config_logs()
 
 
 def get_outdated_pkgs() -> list[str]:
@@ -110,9 +107,14 @@ def get_outdated_pkgs() -> list[str]:
     outdated_pkgs: list = []
 
     try:
-        logger_subprocess.info('Retrieving outdated global pip packages...')
+        logger_upgrade.info('Retrieving outdated global pip packages...')
 
-        with alive_bar(stats=False, elapsed=False, monitor=False):
+        # Enable progress bar.
+        with alive_bar(total=None,
+                       stats=False,
+                       elapsed=False,
+                       monitor=False,
+                       receipt=False):
             cmd: list[str] = [
                 sys.executable, '-m', 'pip', 'list', '--outdated'
             ]
@@ -131,7 +133,7 @@ def get_outdated_pkgs() -> list[str]:
     finally:
         print()
         outdated_pkgs = get_outdated.stdout.decode('utf-8').splitlines()[2:]
-        logger_subprocess.info(
+        logger_upgrade.info(
             f'Outdated packages detected = {len(outdated_pkgs)}.')
         return outdated_pkgs
 
@@ -143,51 +145,70 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
 
     :param outdated_pkgs: list containing found outdated global pip packages.
     :type outdated_pkgs: :class:`list`
-    :return: subprocess to upgrade all found outdated global pip packages.
+    :return: results of pip package upgrade.
     :rtype: :class:`tuple`[:class:`list`, :class:`list`] | None
     """
 
-    logger_subprocess.info('Upgrading outdated pip packages...')
-    logger_subprocess.info(
-        'No. Package            Version           Latest           Type  Status  '
+    logger_upgrade.info('Upgrading outdated pip packages...')
+    logger_upgrade.info(
+        '      No. Package            Version           Latest           Type  Status  '
     )
-    logger_subprocess.info(
-        '--- ------------------ ----------------- ---------------- ----- --------'
+    logger_upgrade.info(
+        '      === ================== ================= ================ ===== ========'
     )
 
     upgradelist: list = []
     errorlist: list = []
 
-    for count, i in enumerate(outdated_pkgs, start=1):
-        pkgname, ver, latest, setuptype = i.split()
-        try:
-            cmd: list = [
-                sys.executable, '-m', 'pip', 'install', '--upgrade', pkgname
-            ]
-            upgrade_outdated: subprocess.CompletedProcess = subprocess.run(
-                cmd,
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT)
+    # Enable progress bar.
+    with alive_bar(total=len(outdated_pkgs), stats=False,
+                   receipt=False) as bar:
 
-        except subprocess.CalledProcessError as err:
-            errorlist.append(pkgname)
+        # iterate through all outdated packages.
+        for count, i in enumerate(outdated_pkgs, start=1):
 
-            logger_subprocess.info(
-                '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
-                    count, pkgname, ver, latest, setuptype, 'FAILED'))
-            logger_file.debug(
-                f'An error occurred during execution of "upgrade_outdated" subprocess:\n',
-                exc_info=err)
+            # Split string into separate individual variables.
+            pkgname, ver, latest, setuptype = i.split()
 
-        else:
-            for line in upgrade_outdated.stdout.decode('utf-8').splitlines():
-                if 'Successfully installed' in line:
-                    upgradelist.append(pkgname)
-                    logger_subprocess.info(
-                        '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
-                            count, pkgname, ver, latest, setuptype,
-                            'UPGRADED'))
+            try:
+                # Command to pass to subprocess.
+                cmd: list = [
+                    sys.executable, '-m', 'pip', 'install', '--upgrade',
+                    pkgname
+                ]
+
+                # Run upgrade subprocess.
+                upgrade_outdated: subprocess.CompletedProcess = subprocess.run(
+                    cmd,
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT)
+
+                bar()  # update progress bar
+
+            # upgrade error
+            except subprocess.CalledProcessError as err:
+                errorlist.append(pkgname)
+
+                logger_upgrade.info(
+                    '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                        count, pkgname, ver, latest, setuptype, 'FAILED'))
+
+                logger_file.debug(
+                    f'An error occurred during execution of "upgrade_outdated" subprocess:\n',
+                    exc_info=err)
+
+            else:  # no error
+                for line in upgrade_outdated.stdout.decode(
+                        'utf-8').splitlines():
+
+                    # display upgrade results.
+                    if 'Successfully installed' in line:
+                        upgradelist.append(pkgname)
+                        logger_upgrade.info(
+                            '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
+                                count, pkgname, ver, latest, setuptype,
+                                'UPGRADED'))
     return upgradelist, errorlist
 
 
@@ -200,9 +221,12 @@ def upgrade_all():
     :rtype: None
     """
 
-    logger_subprocess.info(
+    upgradelist: list = []
+
+    logger_upgrade.info(
         'Upgrading outdated pip packages using "brute force"...')
 
+    # pass command `pip install --upgrade {pkgname}` for all installed pip packages.
     upgrade_script: subprocess.Popen[bytes] = subprocess.Popen(
         ['powershell.exe', './scripts/upgrade_all.ps1'],
         stdout=subprocess.PIPE,
@@ -210,23 +234,36 @@ def upgrade_all():
 
     with upgrade_script.stdout as process:
         try:
-            with alive_bar() as bar:
-                for line in iter(process.readline, b''):
-                    logger_subprocess.info(line.decode('utf-8').strip())
-                    bar()
 
-            print()
-            logger_main.info(
+            # Enable progress bar.
+            with alive_bar(receipt=False) as bar:
+
+                # Display process output
+                for line in iter(process.readline, b''):
+                    logger_upgrade.info(line.decode('utf-8').strip())
+
+                    # update progress bar
+                    if 'Successfully installed' in line.decode('utf-8'):
+                        upgradelist.append(line.decode('utf-8').strip())
+                        bar()
+
+            logger_upgrade.info(
                 'Successfully completed global pip package upgrade!')
+            logger_upgrade.info(f'Upgraded packages = {len(upgradelist)}.')
+
+            for count, _ in enumerate(upgradelist, start=1):
+                logger_upgrade.info(f'{count}. {_}')
 
             print('\nEnter any key to exit...\n')
             getch()
             return exitProgram(0)
 
+        # Exception handling for error returned from subprocess.
         except subprocess.CalledProcessError as err:
-            logger_main.error(
+            logger_upgrade.error(
                 'An error occurred during execution of "upgrade_all" subprocess...',
                 exc_info=err)
+
             return exitProgram(1)
 
 
@@ -242,6 +279,8 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     """
 
     logger_file.debug('Preparing to exit...')
+
+    # display exit text animation
     bar.load('Preparing to exit...',
              'Exiting program...',
              enable_display=False,
@@ -273,11 +312,12 @@ def menu() -> bool:
                 if len(outdated_pkgs):
                     upgradelist, errorlist = upgrade_outdated(outdated_pkgs)
                     total: int = len(outdated_pkgs)
-                    logger_main.info('Successfully completed upgrade process!')
-                    logger_main.info('SUMMARY:')
-                    logger_main.info(
+                    logger_upgrade.info(
+                        'Successfully completed upgrade process!')
+                    logger_upgrade.info('SUMMARY:')
+                    logger_upgrade.info(
                         f'No. of upgrade errors    = {len(errorlist)}/{total}')
-                    logger_main.info(
+                    logger_upgrade.info(
                         f'No. of packages upgraded = {len(upgradelist)}/{total}'
                     )
 
