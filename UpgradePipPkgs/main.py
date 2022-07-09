@@ -16,7 +16,7 @@ sys.path.insert(0, dirname(
 
 chdir(dirname(__file__))  # Change working directory to main module.
 
-__version__ = '0.2.1'  # Version of main module.
+__version__ = '0.3.0'  # Version of main module.
 
 textborder: str = f'\n<{"*" * 120}>\n'  # Text border.
 
