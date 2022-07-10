@@ -51,7 +51,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
         style='{',
         datefmt="%Y-%m-%d - %H:%M:%S")
     file_handler_main: logging.FileHandler = logging.FileHandler(
-        './logs/pip_pkg_upgrade_log.log')
+        './logs/pkg_upgrade_log.log')
     stream_handler_main: logging.StreamHandler = logging.StreamHandler()
 
     file_handler_main.setFormatter(formatter_main)
@@ -63,7 +63,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
         style='{',
         datefmt="%Y-%m-%d - %H:%M:%S")
     file_handler_upgrade: logging.FileHandler = logging.FileHandler(
-        './logs/pip_pkg_upgrade_log.log')
+        './logs/pkg_upgrade_log.log')
     stream_handler_upgrade: logging.StreamHandler = logging.StreamHandler()
 
     file_handler_upgrade.setFormatter(formatter_upgrade)
@@ -75,7 +75,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
         style='{',
         datefmt="%Y-%m-%d - %H:%M:%S")
     file_handler_file: logging.FileHandler = logging.FileHandler(
-        './logs/pip_pkg_upgrade_log.log')
+        './logs/pkg_upgrade_log.log')
 
     file_handler_file.setFormatter(formatter_file)
 
