@@ -8,7 +8,7 @@ from os import chdir
 from os.path import dirname
 from typing import NoReturn
 
-import PyLoadBar
+from PyLoadBar import PyLoadBar
 from alive_progress import alive_bar
 
 sys.path.insert(0, dirname(
@@ -20,7 +20,9 @@ __version__ = '0.3.0'  # Version of main module.
 
 textborder: str = f'\n<{"*" * 120}>\n'  # Text border.
 
-bar: PyLoadBar.PyLoadBar = PyLoadBar.PyLoadBar()  # Initialize progress bar.
+exit_seq: PyLoadBar = PyLoadBar(
+    'Preparing to exit...', 'Exiting program...',
+    enable_bar=False)  # Initialize exit load-sequence.
 
 
 def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
@@ -281,10 +283,7 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     logger_file.debug('Preparing to exit...')
 
     # display exit text animation
-    bar.load('Preparing to exit...',
-             'Exiting program...',
-             enable_display=False,
-             time=3)
+    exit_seq.start()
     logger_file.debug(f'Closing log file...{textborder}')
     return exit(exitcode)
 
