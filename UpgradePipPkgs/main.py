@@ -16,12 +16,11 @@ sys.path.insert(0, dirname(
 
 chdir(dirname(__file__))  # Change working directory to main module.
 
-__version__ = '0.3.0'  # Version of main module.
+__version__ = '0.3.1'  # Version of main module.
 
 textborder: str = f'\n<{"*" * 121}>\n'  # Text border.
 
 exit_seq: PyLoadBar = PyLoadBar(
-    'Preparing to exit', 'Exiting...',
     enable_bar=False)  # Initialize exit load-sequence.
 
 
@@ -283,7 +282,10 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     logger_file.debug('Preparing to exit...')
 
     # display exit text animation
-    exit_seq.start(3, txt_seq_speed=0.5)
+    exit_seq.start('Preparing to exit',
+                   'Exiting...',
+                   iter_total=3,
+                   txt_seq_speed=0.5)
     logger_file.debug(f'Closing log file...{textborder}')
     return exit(exitcode)
 
