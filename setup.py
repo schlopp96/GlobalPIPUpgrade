@@ -5,7 +5,7 @@ readme = pathlib.Path("readme.md").read_text()
 reqs = pathlib.Path("requirements.txt").read_text()
 setup(
     name="UpgradePipPkgs",
-    version="0.3.1",
+    version="0.3.2",
     description=
     "Tool for upgrading all `pip` packages within a Python environment using just one command.",
     url='https://github.com/schlopp96/UpgradePipPkgs',

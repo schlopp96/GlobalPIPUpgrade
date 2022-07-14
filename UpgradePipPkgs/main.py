@@ -16,12 +16,12 @@ sys.path.insert(0, dirname(
 
 chdir(dirname(__file__))  # Change working directory to main module.
 
-__version__ = '0.3.1'  # Version of main module.
+__version__ = '0.3.2'  # Version of main module.
 
 textborder: str = f'\n<{"*" * 121}>\n'  # Text border.
 
 exit_seq: PyLoadBar = PyLoadBar(
-    enable_bar=False)  # Initialize exit load-sequence.
+    bar_sequence=False)  # Initialize exit load-sequence.
 
 
 def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
