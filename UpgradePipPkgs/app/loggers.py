@@ -24,7 +24,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
 
     # Handler for pre/post upgrade subprocess.
     formatter_main: logging.Formatter = logging.Formatter(
-        '[{levelname} :: {name} :: {asctime}  ]\n|>{message}\n',
+        '[{asctime} :: {name} :: {levelname}]\n>> {message}\n',
         style='{',
         datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_main: logging.FileHandler = logging.FileHandler(
@@ -38,7 +38,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
     formatter_upgrade: logging.Formatter = logging.Formatter(
         '[{asctime} :: {name} :: {levelname}] - {message}\n',
         style='{',
-        datefmt="%Y-%m-%d - %H:%M:%S")
+        datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_upgrade: logging.FileHandler = logging.FileHandler(
         './logs/pkg_upgrade_log.log')
     stream_handler_upgrade: logging.StreamHandler = logging.StreamHandler()
@@ -50,7 +50,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
     formatter_file: logging.Formatter = logging.Formatter(
         '[{asctime} :: {name} :: {levelname}] - {message}\n',
         style='{',
-        datefmt="%Y-%m-%d - %H:%M:%S")
+        datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_file: logging.FileHandler = logging.FileHandler(
         './logs/pkg_upgrade_log.log')
 

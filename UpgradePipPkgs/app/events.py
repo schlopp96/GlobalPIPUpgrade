@@ -23,7 +23,7 @@ def get_outdated_pkgs() -> list[str]:
     ---
 
     :return: list of outdated pip packages
-    :rtype: :class:`list`[:class:`str`] | None
+    :rtype: :class:`list`[:class:`str`] | `None`
     """
 
     outdated_pkgs: list = []
@@ -46,11 +46,11 @@ def get_outdated_pkgs() -> list[str]:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT)
 
-    except subprocess.CalledProcessError as err:
+    except subprocess.CalledProcessError:
         print()
         main_log.error(
-            f'An error occurred during execution of "get_outdated_pkgs" subprocess:\n',
-            exc_info=err)
+            f'An error occurred during execution of "get_outdated_pkgs" subprocess...\n',
+            exc_info=True)
 
     finally:
         print()
@@ -67,7 +67,7 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
     :param outdated_pkgs: list containing found outdated global pip packages.
     :type outdated_pkgs: :class:`list`
     :return: results of pip package upgrade.
-    :rtype: :class:`tuple`[:class:`list`, :class:`list`] | None
+    :rtype: :class:`tuple`[:class:`list`, :class:`list`] | `None`
     """
 
     upgrade_log.info('Upgrading outdated pip packages...')
@@ -108,7 +108,7 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
                 bar()  # update progress bar
 
             # upgrade error
-            except subprocess.CalledProcessError as err:
+            except subprocess.CalledProcessError:
                 errorlist.append(pkgname)
 
                 upgrade_log.info(
@@ -116,8 +116,8 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
                         count, pkgname, ver, latest, setuptype, 'FAILED'))
 
                 file_log.debug(
-                    f'An error occurred during execution of "upgrade_outdated" subprocess:\n',
-                    exc_info=err)
+                    f'An error occurred during execution of "upgrade_outdated" subprocess...\n',
+                    exc_info=True)
 
             else:  # no error
                 for line in upgrade_outdated.stdout.decode(
@@ -133,13 +133,13 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
     return upgradelist, errorlist
 
 
-def upgrade_all():
+def upgrade_all() -> None:
     """Start subprocess to pass command `pip install --upgrade {pkgname}` for all installed pip packages.
 
     ---
 
     :return: attempt to upgrade all pip packages
-    :rtype: None
+    :rtype: `None`
     """
 
     upgradelist: list = []
@@ -179,10 +179,10 @@ def upgrade_all():
             return exitProgram(0)
 
         # Exception handling for error returned from subprocess.
-        except subprocess.CalledProcessError as err:
+        except subprocess.CalledProcessError:
             upgrade_log.error(
                 'An error occurred during execution of "upgrade_all" subprocess...',
-                exc_info=err)
+                exc_info=True)
 
             return exitProgram(1)
 
@@ -204,8 +204,9 @@ def exitProgram(exitcode: int) -> NoReturn | None:
     exit_seq.start('Preparing to exit',
                    'Exiting...',
                    iter_total=3,
-                   txt_seq_speed=0.5)
+                   txt_iter_speed=0.5)
     file_log.debug(f'Closing log file...{textborder}')
+
     return exit(exitcode)
 
 
@@ -247,10 +248,10 @@ def menu() -> bool:
                 getch()
                 return True
 
-            except KeyboardInterrupt as err:
+            except KeyboardInterrupt:
                 main_log.warning(
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
-                    exc_info=err)
+                    exc_info=True)
                 return False
 
         elif prompt == '2':
@@ -258,10 +259,10 @@ def menu() -> bool:
                 upgrade_all()
                 return True
 
-            except KeyboardInterrupt as err:
+            except KeyboardInterrupt:
                 main_log.warning(
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
-                    exc_info=err)
+                    exc_info=True)
                 return False
 
         elif prompt == '3':

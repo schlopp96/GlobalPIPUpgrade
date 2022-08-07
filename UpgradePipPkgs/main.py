@@ -5,12 +5,12 @@ from os import chdir
 from os.path import dirname
 from typing import NoReturn
 
-from UpgradePipPkgs.app import events, loggers
-
 sys.path.insert(0, dirname(
-    dirname(__file__)))  # Ensure main module can be found by Python.
+    dirname(__file__)))  # Ensure module can be found by Python.
 
-chdir(dirname(__file__))  # Change working directory to main module.
+chdir(dirname(__file__))  # Change working directory to module.
+
+from UpgradePipPkgs.app import events, loggers
 
 __version__ = '0.4.0'  # Version of main module.
 
@@ -23,7 +23,7 @@ def main() -> NoReturn | None:
     ---
 
     :return: starts program event flow.
-    :rtype: :class:`NoReturn` | None
+    :rtype: :class:`NoReturn` | `None`
     """
 
     logger_main.info(f'Welcome to UpgradePipPkgs {__version__}!')
