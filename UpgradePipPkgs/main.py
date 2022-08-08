@@ -27,7 +27,7 @@ def main() -> NoReturn | None:
     """
 
     logger_main.info(f'Welcome to UpgradePipPkgs {__version__}!')
-    return events.exitProgram(0) if events.menu() else events.exitProgram(1)
+    return events.program_exit(0) if events.menu() else events.program_exit(1)
 
 
 if __name__ == '__main__':

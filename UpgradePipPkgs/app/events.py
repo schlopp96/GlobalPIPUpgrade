@@ -148,7 +148,7 @@ def upgrade_all() -> None:
 
     # pass command `pip install --upgrade {pkgname}` for all installed pip packages.
     upgrade_script: subprocess.Popen[bytes] = subprocess.Popen(
-        ['powershell.exe', '../app/scripts/upgrade_all.ps1'],
+        ['powershell.exe', 'app/scripts/upgrade_all.ps1'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
 
@@ -156,7 +156,7 @@ def upgrade_all() -> None:
         try:
 
             # Enable progress bar.
-            with alive_bar(receipt=False) as bar:
+            with alive_bar(receipt=False, stats=False) as bar:
 
                 # Display process output
                 for line in iter(process.readline, b''):
@@ -176,7 +176,7 @@ def upgrade_all() -> None:
 
             print('\nEnter any key to exit...\n')
             getch()
-            return exitProgram(0)
+            return program_exit(0)
 
         # Exception handling for error returned from subprocess.
         except subprocess.CalledProcessError:
@@ -184,10 +184,10 @@ def upgrade_all() -> None:
                 'An error occurred during execution of "upgrade_all" subprocess...',
                 exc_info=True)
 
-            return exitProgram(1)
+            return program_exit(1)
 
 
-def exitProgram(exitcode: int) -> NoReturn | None:
+def program_exit(exitcode: int) -> NoReturn | None:
     """Close window and exit program.
 
     ---
