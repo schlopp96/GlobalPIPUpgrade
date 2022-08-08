@@ -56,6 +56,7 @@ def get_outdated_pkgs() -> list[str]:
         print()
         outdated_pkgs = get_outdated.stdout.decode('utf-8').splitlines()[2:]
         upgrade_log.info(f'Outdated packages detected = {len(outdated_pkgs)}.')
+
         return outdated_pkgs
 
 
@@ -130,6 +131,7 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
                             '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
                                 count, pkgname, ver, latest, setuptype,
                                 'UPGRADED'))
+
     return upgradelist, errorlist
 
 
@@ -176,6 +178,7 @@ def upgrade_all() -> None:
 
             print('\nEnter any key to exit...\n')
             getch()
+
             return program_exit(0)
 
         # Exception handling for error returned from subprocess.
@@ -203,8 +206,8 @@ def program_exit(exitcode: int) -> NoReturn | None:
     # display exit text animation
     exit_seq.start('Preparing to exit',
                    'Exiting...',
-                   iter_total=3,
-                   txt_iter_speed=0.5)
+                   iter_total=5,
+                   txt_iter_speed=0.25)
     file_log.debug(f'Closing log file...{textborder}')
 
     return exit(exitcode)
@@ -246,26 +249,31 @@ def menu() -> bool:
 
                 print('\nPress any key to exit...\n')
                 getch()
+
                 return True
 
             except KeyboardInterrupt:
                 main_log.warning(
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
                     exc_info=True)
+
                 return False
 
         elif prompt == '2':
             try:
                 upgrade_all()
+
                 return True
 
             except KeyboardInterrupt:
                 main_log.warning(
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
                     exc_info=True)
+
                 return False
 
         elif prompt == '3':
+
             return True
 
         else:
