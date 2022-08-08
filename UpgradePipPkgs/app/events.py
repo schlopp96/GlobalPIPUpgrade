@@ -148,7 +148,7 @@ def upgrade_all() -> None:
 
     # pass command `pip install --upgrade {pkgname}` for all installed pip packages.
     upgrade_script: subprocess.Popen[bytes] = subprocess.Popen(
-        ['powershell.exe', './scripts/upgrade_all.ps1'],
+        ['powershell.exe', '../app/scripts/upgrade_all.ps1'],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
 
