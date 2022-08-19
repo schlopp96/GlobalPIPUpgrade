@@ -23,10 +23,10 @@ def get_outdated_pkgs() -> list[str]:
     ---
 
     :return: list of outdated pip packages
-    :rtype: :class:`list`[:class:`str`] | `None`
+    :rtype: :class:`list`[:class:`str`]
     """
 
-    outdated_pkgs: list = []
+    outdated_pkgs: list = []  # list of outdated pip packages
 
     try:
         upgrade_log.info('Retrieving outdated global pip packages...')
@@ -47,13 +47,13 @@ def get_outdated_pkgs() -> list[str]:
                 stderr=subprocess.STDOUT)
 
     except subprocess.CalledProcessError:
-        print()
+        print()  # newline
         main_log.error(
             f'An error occurred during execution of "get_outdated_pkgs" subprocess...\n',
             exc_info=True)
 
     finally:
-        print()
+        print()  # newline
         outdated_pkgs = get_outdated.stdout.decode('utf-8').splitlines()[2:]
         upgrade_log.info(f'Outdated packages detected = {len(outdated_pkgs)}.')
 
@@ -68,7 +68,7 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
     :param outdated_pkgs: list containing found outdated global pip packages.
     :type outdated_pkgs: :class:`list`
     :return: results of pip package upgrade.
-    :rtype: :class:`tuple`[:class:`list`, :class:`list`] | `None`
+    :rtype: :class:`tuple`[:class:`list`, :class:`list`]
     """
 
     upgrade_log.info('Upgrading outdated pip packages...')
@@ -90,9 +90,9 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
         for count, i in enumerate(outdated_pkgs, start=1):
 
             # Split string into separate individual variables.
-            pkgname, ver, latest, setuptype = i.split()
 
             try:
+                pkgname, ver, latest, setuptype = i.split()
                 # Command to pass to subprocess.
                 cmd: list = [
                     sys.executable, '-m', 'pip', 'install', '--upgrade',
@@ -146,7 +146,7 @@ def upgrade_all() -> None:
 
     upgradelist: list = []
 
-    upgrade_log.info('Upgrading outdated pip packages using "brute force"...')
+    upgrade_log.info('Upgrading outdated pip packages "brute force" 1 by 1...')
 
     # pass command `pip install --upgrade {pkgname}` for all installed pip packages.
     upgrade_script: subprocess.Popen[bytes] = subprocess.Popen(
@@ -198,7 +198,7 @@ def program_exit(exitcode: int) -> NoReturn | None:
     :param exitcode: code reflecting whether program exit was due to successful or failed operation.
     :type exitcode: :class:`int`
     :return: exits program with passed `exitcode`.
-    :rtype: :class:`NoReturn` | None
+    :rtype: :class:`NoReturn` | `None`
     """
 
     file_log.debug('Preparing to exit...')
@@ -213,70 +213,142 @@ def program_exit(exitcode: int) -> NoReturn | None:
     return exit(exitcode)
 
 
-def menu() -> bool:
+class menu:
     """Display menu and prompt user for selection.
 
     ---
 
-    :return: menu text and user selection.
-    :rtype: None
+    Menu options:
+
+    ```python
+        1. Upgrade outdated pip packages.
+        2. "Brute-force-upgrade" all packages (one by one).
+        3. Exit.
+    ```
+    ---
+
+    :return: user selection.
+    :rtype: `None`
     """
 
-    while True:
+    def __init__(self) -> None:
+        self.menu_options: list = [
+            'Upgrade outdated pip packages',
+            '"Brute-force-upgrade" all packages (one by one)', 'Exit'
+        ]
+
+    def display(self) -> None:
+        """Display menu and prompt user for selection.
+        """
         file_log.debug('Displaying user options menu...')
-        prompt: str = input(
-            f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade pip pkgs (longer but more verbose).     |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
-        )
-        print()
 
-        if prompt == '1':
+        for count, i in enumerate(self.menu_options, start=1):
+            print(f'|\n|{count}. {i}')
+
+    @staticmethod
+    def get_input() -> int:
+        """Prompt user for selection.
+        """
+        while True:
             try:
-                outdated_pkgs: list[str] = get_outdated_pkgs()
+                prompt: str = input(
+                    f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade pip pkgs (longer but more verbose).     |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
+                )
+                print()
+                return int(prompt)
 
-                if len(outdated_pkgs):
-                    upgradelist, errorlist = upgrade_outdated(outdated_pkgs)
-                    total: int = len(outdated_pkgs)
-                    upgrade_log.info('Successfully completed upgrade process!')
-                    upgrade_log.info('SUMMARY:')
-                    upgrade_log.info(
-                        f'No. of upgrade errors    = {len(errorlist)}/{total}')
-                    upgrade_log.info(
-                        f'No. of packages upgraded = {len(upgradelist)}/{total}'
-                    )
+            except ValueError:
+                main_log.info(
+                    f'Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.'
+                )
+                continue
+
+    def _logic(self):
+        opt = options()
+        while True:
+            try:
+                prompt = self.get_input()
+
+                if prompt == 1:
+                    return opt.option_1()
+
+                elif prompt == 2:
+                    return opt.option_2()
+
+                elif prompt == 3:
+                    return True
 
                 else:
-                    main_log.info('No outdated packages found!')
-
-                print('\nPress any key to exit...\n')
-                getch()
-
-                return True
+                    main_log.info(
+                        f'Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.'
+                    )
 
             except KeyboardInterrupt:
                 main_log.warning(
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
                     exc_info=True)
-
                 return False
 
-        elif prompt == '2':
-            try:
-                upgrade_all()
-
-                return True
-
-            except KeyboardInterrupt:
-                main_log.warning(
-                    'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
+            except subprocess.CalledProcessError:
+                upgrade_log.error(
+                    'An error occurred during execution of "upgrade_all" subprocess...',
                     exc_info=True)
-
                 return False
 
-        elif prompt == '3':
 
+class options:
+
+    @staticmethod
+    def option_1() -> bool:
+        """Upgrade outdated pip packages."""
+
+        file_log.debug('User selected option 1.')
+        try:
+            outdated_pkgs: list[str] = get_outdated_pkgs()
+
+            if len(outdated_pkgs):
+                upgradelist, errorlist = upgrade_outdated(outdated_pkgs)
+                total: int = len(outdated_pkgs)
+                upgrade_log.info('Successfully completed upgrade process!')
+                upgrade_log.info('SUMMARY:')
+                upgrade_log.info(
+                    f'No. of upgrade errors    = {len(errorlist)}/{total}')
+                upgrade_log.info(
+                    f'No. of packages upgraded = {len(upgradelist)}/{total}')
+            else:
+                main_log.info('No outdated packages found!')
+
+            print('\nPress any key to exit...\n')
+            getch()
             return True
 
-        else:
-            main_log.info(
-                f'Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.'
-            )
+        except KeyboardInterrupt:
+            main_log.warning(
+                'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
+                exc_info=True)
+            return False
+
+        except Exception:
+            upgrade_log.error(
+                'An error occurred during execution of "upgrade_outdated" subprocess...',
+                exc_info=True)
+            return False
+
+    @staticmethod
+    def option_2() -> bool:
+        """"Brute-force-upgrade" all packages (one by one).
+            """
+        file_log.debug('User selected option 2.')
+        try:
+            upgrade_all()
+            return True
+        except KeyboardInterrupt:
+            main_log.warning(
+                'Keyboard interrupt was triggered by user during execution of "upgrade_all" subprocess...',
+                exc_info=True)
+            return False
+        except Exception:
+            upgrade_log.error(
+                'An error occurred during execution of "upgrade_all" subprocess...',
+                exc_info=True)
+            return False
