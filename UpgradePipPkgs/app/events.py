@@ -216,11 +216,14 @@ def program_exit(exitcode: int) -> None | NoReturn:
         return exit(exitcode)
 
     except KeyboardInterrupt:
+        file_log.debug(f'Closing log file...{textborder}')
         return exit(exitcode)
 
     except Exception:
         file_log.error('Error occurred while trying to exit program',
                        exc_info=True)
+        file_log.debug(f'Closing log file...{textborder}')
+
         return exit(exitcode)
 
 
