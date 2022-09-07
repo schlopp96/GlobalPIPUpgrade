@@ -344,8 +344,8 @@ class options:
 
     @staticmethod
     def option_2() -> bool:
-        """"Brute-force-upgrade" all packages (one by one).
-            """
+        """"Brute-force-upgrade" all packages (one by one)."""
+
         file_log.debug('User selected option 2.')
         try:
             upgrade_all()
@@ -355,6 +355,7 @@ class options:
                 'Keyboard interrupt was triggered by user during execution of "upgrade_all" subprocess...',
                 exc_info=True)
             return False
+
         except Exception:
             upgrade_log.error(
                 'An error occurred during execution of "upgrade_all" subprocess...',
