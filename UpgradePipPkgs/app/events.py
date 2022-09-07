@@ -263,8 +263,16 @@ class menu:
                 )
                 continue
 
-    def _logic(self):
-        opt = options()
+    def _logic(self) -> bool:
+        """
+        It's a function that prompts the user to choose between three options, and then executes the chosen
+        option
+        :return: The return value of the function.
+        :rtype: :class:`bool`
+        """
+
+        opt: options = options()
+
         while True:
             try:
                 prompt = self.get_input()
