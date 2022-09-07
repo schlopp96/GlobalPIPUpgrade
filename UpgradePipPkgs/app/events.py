@@ -296,14 +296,6 @@ class menu:
                     'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
                     exc_info=True)
                 return False
-
-            except subprocess.CalledProcessError:
-                upgrade_log.error(
-                    'An error occurred during execution of "upgrade_all" subprocess...',
-                    exc_info=True)
-                return False
-
-
 class options:
     """Contains all options from main menu."""
 
