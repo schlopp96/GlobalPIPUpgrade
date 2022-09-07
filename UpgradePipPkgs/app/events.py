@@ -155,6 +155,8 @@ def upgrade_all() -> None:
         stderr=subprocess.STDOUT)
 
     with upgrade_script.stdout as process:
+        # Ignore mypy error: Item "None" of "Optional[IO[bytes]]" has no attribute "__enter__"
+        # Ignore mypy error: Item "None" of "Optional[IO[bytes]]" has no attribute "__exit__"
         try:
 
             # Enable progress bar.
@@ -190,7 +192,7 @@ def upgrade_all() -> None:
             return program_exit(1)
 
 
-def program_exit(exitcode: int) -> NoReturn | None:
+def program_exit(exitcode: int) -> None | NoReturn:
     """Close window and exit program.
 
     ---
@@ -201,16 +203,25 @@ def program_exit(exitcode: int) -> NoReturn | None:
     :rtype: :class:`NoReturn` | `None`
     """
 
-    file_log.debug('Preparing to exit...')
+    try:
+        file_log.debug('Preparing to exit...')
 
-    # display exit text animation
-    exit_seq.start('Preparing to exit',
-                   'Exiting...',
-                   iter_total=5,
-                   txt_iter_speed=0.25)
-    file_log.debug(f'Closing log file...{textborder}')
+        # display exit text animation
+        exit_seq.start('Preparing to exit',
+                       'Exiting...',
+                       iter_total=5,
+                       txt_iter_speed=0.25)
+        file_log.debug(f'Closing log file...{textborder}')
 
-    return exit(exitcode)
+        return exit(exitcode)
+
+    except KeyboardInterrupt:
+        return exit(exitcode)
+
+    except Exception:
+        file_log.error('Error occurred while trying to exit program',
+                       exc_info=True)
+        return exit(exitcode)
 
 
 class menu:
@@ -296,6 +307,8 @@ class menu:
                     'Keyboard interrupt was triggered by user during menu process...',
                     exc_info=True)
                 return False
+
+
 class options:
     """Contains all options from main menu."""
 
