@@ -305,6 +305,7 @@ class menu:
 
 
 class options:
+    """Contains all options from main menu."""
 
     @staticmethod
     def option_1() -> bool:
@@ -344,7 +345,10 @@ class options:
 
     @staticmethod
     def option_2() -> bool:
-        """"Brute-force-upgrade" all packages (one by one)."""
+        """Upgrade all packages one-by-one.
+
+        - "Brute-force-upgrade".
+        """
 
         file_log.debug('User selected option 2.')
         try:
