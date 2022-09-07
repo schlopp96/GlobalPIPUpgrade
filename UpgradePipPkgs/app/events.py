@@ -235,11 +235,6 @@ class menu:
         1. Upgrade outdated pip packages.
         2. "Brute-force-upgrade" all packages (one by one).
         3. Exit.
-    ```
-    ---
-
-    :return: user selection.
-    :rtype: `None`
     """
 
     def __init__(self) -> None:
@@ -281,7 +276,7 @@ class menu:
         :return: The return value of the function.
         :rtype: :class:`bool`
         """
-
+        file_log.debug('Running menu logic...\n')
         opt: options = options()
 
         while True:
@@ -310,13 +305,29 @@ class menu:
 
 
 class options:
-    """Contains all options from main menu."""
+    """Contains all options from main menu.
+
+    ---
+
+    Options:
+
+        - Option 1
+            - Upgrade outdated pip packages
+
+        - Option 2
+            - Upgrade all pip packages.
+    """
 
     @staticmethod
     def option_1() -> bool:
-        """Upgrade outdated pip packages."""
+        """Upgrade outdated pip packages.
+
+        :return: `True` if upgrade is successful
+        :rtype: :class:`bool`
+        """
 
         file_log.debug('User selected option 1.')
+
         try:
             outdated_pkgs: list[str] = get_outdated_pkgs()
 
@@ -350,15 +361,18 @@ class options:
 
     @staticmethod
     def option_2() -> bool:
-        """Upgrade all packages one-by-one.
+        """Upgrade all installed packages.
 
-        - "Brute-force-upgrade".
+        :return: `True` if upgrade is successful
+        :rtype: :class:`bool`
         """
 
         file_log.debug('User selected option 2.')
+
         try:
             upgrade_all()
             return True
+
         except KeyboardInterrupt:
             main_log.warning(
                 'Keyboard interrupt was triggered by user during execution of "upgrade_all" subprocess...',
