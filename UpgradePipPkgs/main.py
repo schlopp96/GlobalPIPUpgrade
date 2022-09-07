@@ -17,6 +17,7 @@ __version__ = '0.4.0'  # Version of main module.
 logger_main = loggers.logger_main
 menu = events.menu()  # Start program event flow.
 
+
 def main() -> NoReturn | None:
     """Program entry point.
 

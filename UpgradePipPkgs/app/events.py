@@ -261,7 +261,7 @@ class menu:
         while True:
             try:
                 prompt: str = input(
-                    f'|{"*"*78}|\n| > Upgrade all outdated global pip packages?                                  |\n| > Enter [1] to get list of outdated pip pkgs before upgrading list contents. |\n| > Enter [2] to "brute-force" upgrade pip pkgs (longer but more verbose).     |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
+                    f'|{"*"*78}|\n| > Please choose an option:                                                   |\n|                                                                              |\n| > Enter [1] to upgrade outdated pip pkgs.                                    |\n| > Enter [2] to upgrade all installed pip pkgs (longer but more verbose).     |\n| > Enter [3] to exit program.                                                 |\n|{"*"* 78}|\n>>> '
                 )
                 print()
                 return int(prompt)

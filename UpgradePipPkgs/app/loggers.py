@@ -4,6 +4,15 @@ import logging
 def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
     """Generate program loggers.
 
+    - `logger_file`:
+        - Logger for low-level program operations.
+
+    - `logger_main`:
+        - Logger for general program flow.
+
+    - `logger_upgrade`:
+        - Logger for all events during upgrade subprocess.
+
     ---
 
     :return: program logging configuration.
