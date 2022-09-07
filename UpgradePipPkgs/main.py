@@ -12,7 +12,7 @@ chdir(dirname(__file__))  # Change working directory to module.
 
 from UpgradePipPkgs.app import events, loggers
 
-__version__ = '0.4.0'  # Version of main module.
+__version__ = '0.4.1'  # Version of main module.
 
 logger_main = loggers.logger_main
 menu = events.menu()  # Start program event flow.
