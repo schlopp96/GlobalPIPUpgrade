@@ -24,7 +24,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
 
     # Handler for pre/post upgrade subprocess.
     formatter_main: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {name} :: {levelname}]\n>> {message}\n',
+        '[{asctime} :: {levelname}]\n>> {message}\n',
         style='{',
         datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_main: logging.FileHandler = logging.FileHandler(
@@ -36,7 +36,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
 
     # Handler for upgrade subprocess
     formatter_upgrade: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {name} :: {levelname}] - {message}\n',
+        '[{asctime} :: {levelname}] - {message}\n',
         style='{',
         datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_upgrade: logging.FileHandler = logging.FileHandler(
@@ -48,7 +48,7 @@ def config_logs() -> tuple[logging.Logger, logging.Logger, logging.Logger]:
 
     # Handler for file logging.
     formatter_file: logging.Formatter = logging.Formatter(
-        '[{asctime} :: {name} :: {levelname}] - {message}\n',
+        '[{asctime} :: {levelname}] - {message}\n',
         style='{',
         datefmt="%Y-%m-%d %H:%M:%S")
     file_handler_file: logging.FileHandler = logging.FileHandler(
