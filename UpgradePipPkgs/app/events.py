@@ -116,7 +116,7 @@ def upgrade_outdated(outdated_pkgs: list) -> (tuple[list, list]):
                     '{0:<4}{1:<19}{2:<18}{3:<17}{4:<6}{5:<8}'.format(
                         count, pkgname, ver, latest, setuptype, 'FAILED'))
 
-                file_log.debug(
+                file_log.error(
                     f'An error occurred during execution of "upgrade_outdated" subprocess...\n',
                     exc_info=True)
 
@@ -258,7 +258,7 @@ class menu:
                 return int(prompt)
 
             except ValueError:
-                main_log.info(
+                main_log.warning(
                     f'Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.'
                 )
                 continue
@@ -287,13 +287,13 @@ class menu:
                     return True
 
                 else:
-                    main_log.info(
+                    main_log.warning(
                         f'Incorrect response: "{prompt}".\n==> Accepted values are limited to: "1", "2" or "3".\n==> Please try again.'
                     )
 
             except KeyboardInterrupt:
                 main_log.warning(
-                    'Keyboard interrupt was triggered by user during execution of "upgrade_outdated" subprocess...',
+                    'Keyboard interrupt was triggered by user during menu process...',
                     exc_info=True)
                 return False
 class options:
