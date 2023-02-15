@@ -179,6 +179,7 @@ def upgrade_all() -> None:
                 upgrade_log.info(f'{count}. {_}')
 
             print('\nEnter any key to exit...\n')
+            getch()
 
             return program_exit(0)
 
