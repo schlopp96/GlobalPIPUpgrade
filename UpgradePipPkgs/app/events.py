@@ -158,38 +158,52 @@ def upgrade_all() -> None:
         # Ignore mypy error: Item "None" of "Optional[IO[bytes]]" has no attribute "__enter__"
         # Ignore mypy error: Item "None" of "Optional[IO[bytes]]" has no attribute "__exit__"
         try:
+            return _upgrade_all_process(process, upgradelist)
 
-            # Enable progress bar.
-            with alive_bar(receipt=False, stats=False) as bar:
-
-                # Display process output
-                for line in iter(process.readline, b''):
-                    upgrade_log.info(line.decode('utf-8').strip())
-
-                    # update progress bar
-                    if 'Successfully installed' in line.decode('utf-8'):
-                        upgradelist.append(line.decode('utf-8').strip())
-                        bar()
-
-            upgrade_log.info(
-                'Successfully completed global pip package upgrade!')
-            upgrade_log.info(f'Upgraded packages = {len(upgradelist)}.')
-
-            for count, _ in enumerate(upgradelist, start=1):
-                upgrade_log.info(f'{count}. {_}')
-
-            print('\nEnter any key to exit...\n')
-            getch()
-
-            return program_exit(0)
-
-        # Exception handling for error returned from subprocess.
         except subprocess.CalledProcessError:
             upgrade_log.error(
                 'An error occurred during execution of "upgrade_all" subprocess...',
                 exc_info=True)
 
             return program_exit(1)
+
+
+# TODO Rename this here and in `upgrade_all`
+def _upgrade_all_process(process, upgradelist) -> None:
+    """
+    Upgrade global pip packages.
+
+    - Displays the progress using a progress bar.
+
+    :param process: The `process` parameter is a subprocess object that represents the process being
+    executed. It is used to read the output of the process and update the progress bar
+    :param upgradelist: The `upgradelist` parameter is a list that is used to store the names of the
+    packages that have been successfully upgraded
+    :return: `None`.
+    """
+
+    # Enable progress bar.
+    with alive_bar(receipt=False, stats=False) as bar:
+
+        # Display process output
+        for line in iter(process.readline, b''):
+            upgrade_log.info(line.decode('utf-8').strip())
+
+            # update progress bar
+            if 'Successfully installed' in line.decode('utf-8'):
+                upgradelist.append(line.decode('utf-8').strip())
+                bar()
+
+    upgrade_log.info('Successfully completed global pip package upgrade!')
+    upgrade_log.info(f'Upgraded packages = {len(upgradelist)}.')
+
+    for count, _ in enumerate(upgradelist, start=1):
+        upgrade_log.info(f'{count}. {_}')
+
+    print('\nEnter any key to exit...\n')
+    getch()
+
+    return program_exit(0)
 
 
 def program_exit(exitcode: int) -> None | NoReturn:
