@@ -1,4 +1,5 @@
 #!/usr/bin/env pwsh
+
 function UpgradePIP {
     <#
         .SYNOPSIS
