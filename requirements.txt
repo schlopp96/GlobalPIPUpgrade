@@ -1,3 +1,4 @@
 alive_progress>=2.4.1
 PyLoadBar==0.2.0
 setuptools>=62.1.0
+tqdm>=4.66.3 # not directly required, pinned by Snyk to avoid a vulnerability
